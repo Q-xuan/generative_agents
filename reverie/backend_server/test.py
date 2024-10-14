@@ -5,36 +5,50 @@ File: gpt_structure.py
 Description: Wrapper functions for calling OpenAI APIs.
 """
 import json
+import os
 import random
 import openai
-import time 
+import time
+
+from openai import OpenAI
 
 from utils import *
+
+os.environ['http_proxy'] = 'http://127.0.0.1:49907'
 openai.api_key = openai_api_key
 
-def ChatGPT_request(prompt): 
-  """
-  Given a prompt and a dictionary of GPT parameters, make a request to OpenAI
-  server and returns the response. 
-  ARGS:
-    prompt: a str prompt
-    gpt_parameter: a python dictionary with the keys indicating the names of  
-                   the parameter and the values indicating the parameter 
-                   values.   
-  RETURNS: 
-    a str of GPT-3's response. 
-  """
-  # temp_sleep()
-  try: 
-    completion = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo", 
-    messages=[{"role": "user", "content": prompt}]
-    )
-    return completion["choices"][0]["message"]["content"]
-  
-  except: 
-    print ("ChatGPT ERROR")
-    return "ChatGPT ERROR"
+
+def ChatGPT_request(prompt):
+    """
+    Given a prompt and a dictionary of GPT parameters, make a request to OpenAI
+    server and returns the response.
+    ARGS:
+      prompt: a str prompt
+      gpt_parameter: a python dictionary with the keys indicating the names of
+                     the parameter and the values indicating the parameter
+                     values.
+    RETURNS:
+      a str of GPT-3's response.
+    """
+    # temp_sleep()
+    try:
+        client = OpenAI(
+            # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
+            api_key=openai_api_key,
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        )
+        completion = client.chat.completions.create(
+            model="qwen-plus",  # 模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
+            messages=[
+                {'role': 'user', 'content': '你是谁？'}],
+        )
+        print(completion.choices[0].message.content)
+        return completion["choices"][0]["message"]["content"]
+
+    except Exception as e:
+        print(e)
+        return "ChatGPT ERROR"
+
 
 prompt = """
 ---
@@ -61,16 +75,4 @@ Example output json:
 {"output": "[["Jane Doe", "Hi!"], ["John Doe", "Hello there!"] ... ]"}
 """
 
-print (ChatGPT_request(prompt))
-
-
-
-
-
-
-
-
-
-
-
-
+print(ChatGPT_request(prompt))
