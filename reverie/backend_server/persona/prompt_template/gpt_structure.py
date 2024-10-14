@@ -5,19 +5,20 @@ File: gpt_structure.py
 Description: Wrapper functions for calling OpenAI APIs.
 """
 import json
+import os
 import random
 import openai
 import time
 
 from openai import OpenAI
 
-from reverie.backend_server.utils import *
+from utils import *
 
 os.environ['http_proxy'] = 'http://127.0.0.1:49907'
 client = OpenAI(
     # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
     api_key=openai_api_key,
-    default_headers={"x-foo": "true"}
+    base_url="https://cn.aaai.vip/v1",
 )
 
 
@@ -58,7 +59,8 @@ def GPT4_request(prompt):
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}]
         )
-        return completion["choices"][0]["message"]["content"]
+
+        return completion.choices[0].message.content
 
     except:
         print("ChatGPT ERROR")
@@ -83,7 +85,7 @@ def ChatGPT_request(prompt):
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}]
         )
-        return completion["choices"][0]["message"]["content"]
+        return completion.choices[0].message.content
 
     except:
         print("ChatGPT ERROR")
@@ -287,7 +289,7 @@ def get_embedding(text, model="text-embedding-ada-002"):
     if not text:
         text = "this is blank"
     return client.embeddings.create(
-        input=[text], model=model)['data'][0]['embedding']
+        input=[text], model=model).data[0].embedding
 
 
 if __name__ == '__main__':

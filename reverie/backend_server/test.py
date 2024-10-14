@@ -35,15 +35,15 @@ def ChatGPT_request(prompt):
         client = OpenAI(
             # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
             api_key=openai_api_key,
-            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+            base_url="https://cn.aaai.vip/v1",
         )
         completion = client.chat.completions.create(
-            model="qwen-plus",  # 模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
+            model="gpt-3.5-turbo",  # 模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
             messages=[
-                {'role': 'user', 'content': '你是谁？'}],
+                {'role': 'user', 'content': prompt}],
         )
         print(completion.choices[0].message.content)
-        return completion["choices"][0]["message"]["content"]
+        return completion.choices[0].message.content
 
     except Exception as e:
         print(e)
